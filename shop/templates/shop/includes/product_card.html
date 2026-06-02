@@ -1,0 +1,48 @@
+<div class="product-card h-100">
+    {% if product.discount_percent %}
+    <div class="badge-discount">-{{ product.discount_percent }}%</div>
+    {% endif %}
+    {% if product.is_featured %}
+    <div class="badge-hit">ХІТ</div>
+    {% endif %}
+
+    <a href="{{ product.get_absolute_url }}" class="product-img-link">
+        <div class="product-img-wrapper">
+            {% if product.cover %}
+            <img src="{{ product.cover.url }}" alt="{{ product.name }}" class="product-img">
+            {% else %}
+            <div class="product-img-placeholder">
+                <span>📖</span>
+            </div>
+            {% endif %}
+        </div>
+    </a>
+
+    <div class="product-card-body">
+        <div class="product-rating mb-1">
+            <span class="star">★</span>
+            <span class="rating-value">{{ product.rating }}</span>
+            <span class="rating-count text-muted">({{ product.rating_count }})</span>
+        </div>
+
+        <a href="{{ product.get_absolute_url }}" class="product-name-link">
+            <h6 class="product-name">{{ product.name }}</h6>
+        </a>
+        <p class="product-author text-muted small">{{ product.author }}</p>
+
+        <div class="product-price-block mt-auto">
+            {% if product.old_price %}
+            <span class="old-price">{{ product.old_price }} грн</span>
+            {% endif %}
+            <span class="current-price">{{ product.price }} грн</span>
+        </div>
+
+        <form action="{% url 'cart:cart_add' product.id %}" method="post" class="mt-2 add-to-cart-form">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn btn-cart w-100">
+                <i class="fas fa-shopping-cart me-1"></i>У кошик
+            </button>
+        </form>
+    </div>
+</div>

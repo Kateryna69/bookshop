@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Доставка і оплата — КнигоСвіт{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">🚚 Доставка і оплата</h1>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="profile-card">
+                <h5 class="mb-4">🚚 Способи доставки</h5>
+                <div class="p-3 border rounded mb-3">
+                    <strong>Нова Пошта</strong>
+                    <p class="text-muted small mb-0">1-2 дні. Безкоштовно від 990 грн, інакше ~90 грн</p>
+                </div>
+                <div class="p-3 border rounded mb-3">
+                    <strong>Укрпошта</strong>
+                    <p class="text-muted small mb-0">3-5 днів. Від 50 грн</p>
+                </div>
+                <div class="p-3 border rounded">
+                    <strong>Самовивіз</strong>
+                    <p class="text-muted small mb-0">м. Київ, вул. Хрещатик, 1. Безкоштовно</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="profile-card">
+                <h5 class="mb-4">💳 Способи оплати</h5>
+                <div class="p-3 border rounded mb-3">
+                    <strong>💳 Картою онлайн</strong>
+                    <p class="text-muted small mb-0">Visa, Mastercard, Приват24</p>
+                </div>
+                <div class="p-3 border rounded mb-3">
+                    <strong>📱 Переказ на карту</strong>
+                    <p class="text-muted small mb-0">Monobank, ПриватБанк</p>
+                </div>
+                <div class="p-3 border rounded">
+                    <strong>📦 Накладений платіж</strong>
+                    <p class="text-muted small mb-0">Оплата при отриманні (+30 грн)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

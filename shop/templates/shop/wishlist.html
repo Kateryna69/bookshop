@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Бажане — КнигоСвіт{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">❤️ Моє бажане</h1>
+    {% if wishlist %}
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+        {% for item in wishlist %}
+        <div class="col">
+            {% with product=item.product %}
+            {% include 'shop/includes/product_card.html' %}
+            {% endwith %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state text-center py-5">
+        <div class="empty-icon">💔</div>
+        <h3>Список бажаного порожній</h3>
+        <p class="text-muted">Додайте книги які хочете придбати</p>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary mt-2">До каталогу</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

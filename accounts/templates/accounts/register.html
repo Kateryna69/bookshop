@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Реєстрація — КнигоСвіт{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="auth-card">
+                <div class="auth-header text-center mb-4">
+                    <div class="auth-icon">📝</div>
+                    <h2>Реєстрація</h2>
+                    <p class="text-muted">Створіть свій акаунт у КнигоСвіт</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="register-section mb-4">
+                        <h6 class="register-section-title">
+                            <i class="fas fa-lock me-2 text-primary"></i>Обов'язкові дані
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ім'я користувача *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Пароль *</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Підтвердіть пароль *</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="register-section mb-4">
+                        <h6 class="register-section-title">
+                            <i class="fas fa-user me-2 text-success"></i>Особиста інформація
+                            <span class="text-muted fw-normal">(необов'язково)</span>
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Ім'я</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Прізвище</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">Телефон</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Місто</label>
+                                {{ form.city }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-buy w-100">
+                        <i class="fas fa-user-plus me-2"></i>Зареєструватися
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <span class="text-muted small">Вже є акаунт?</span>
+                    <a href="{% url 'accounts:login' %}" class="ms-1 small fw-bold">Увійти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

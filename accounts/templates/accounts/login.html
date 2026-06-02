@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Вхід — КнигоСвіт{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="auth-card">
+                <div class="auth-header text-center mb-4">
+                    <div class="auth-icon">🔐</div>
+                    <h2>Вхід</h2>
+                    <p class="text-muted">Увійдіть до свого акаунту</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Пароль</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-buy w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Увійти
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <span class="text-muted small">Ще немає акаунту?</span>
+                    <a href="{% url 'accounts:register' %}" class="ms-1 small">Зареєструватися</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

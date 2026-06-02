@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — {{ product.author }} — КнигоСвіт{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}">Головна</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+            </li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <div class="col-md-4 col-lg-3">
+            <div class="detail-cover-wrapper text-center">
+                {% if product.cover %}
+                <img src="{{ product.cover.url }}" alt="{{ product.name }}" class="detail-cover">
+                {% else %}
+                <div class="detail-cover-placeholder">📖</div>
+                {% endif %}
+                {% if product.discount_percent %}
+                <div class="detail-badge-discount">-{{ product.discount_percent }}%</div>
+                {% endif %}
+            </div>
+            <div class="text-center mt-3">
+                {% if user.is_authenticated %}
+                <a href="{% url 'shop:wishlist_toggle' product.id %}"
+                   class="btn {% if in_wishlist %}btn-danger{% else %}btn-outline-danger{% endif %} w-100">
+                    <i class="fa{% if in_wishlist %}s{% else %}r{% endif %} fa-heart me-2"></i>
+                    {% if in_wishlist %}У бажаному{% else %}Додати в бажане{% endif %}
+                </a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-danger w-100">
+                    <i class="far fa-heart me-2"></i>Додати в бажане
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-8 col-lg-6">
+            <div class="detail-category mb-2">
+                <a href="{{ product.category.get_absolute_url }}" class="category-tag">
+                    {{ product.category.icon }} {{ product.category.name }}
+                </a>
+            </div>
+            <h1 class="detail-title">{{ product.name }}</h1>
+            <p class="detail-author">
+                <i class="fas fa-pen-nib me-2 text-muted"></i>{{ product.author }}
+            </p>
+            {% if product.publisher %}
+            <p class="text-muted small mb-2">
+                <i class="fas fa-building me-2"></i>Видавництво: <strong>{{ product.publisher }}</strong>
+            </p>
+            {% endif %}
+            <div class="detail-rating mb-4">
+                {% for i in "12345" %}
+                <span class="star {% if product.rating >= forloop.counter %}filled{% endif %}">★</span>
+                {% endfor %}
+                <span class="ms-2 text-muted small">{{ product.rating }} / 5 ({{ product.rating_count }} оцінок)</span>
+            </div>
+
+            <div class="detail-description-box mb-4">
+                <h5 class="mb-3">📖 Про книгу</h5>
+                <p class="detail-description-text">
+                    {{ product.description|default:"Опис відсутній."|linebreaksbr }}
+                </p>
+            </div>
+
+            <div class="detail-specs mb-4">
+                <h5 class="mb-3">📋 Характеристики</h5>
+                <table class="table table-sm specs-table">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted">Автор</td>
+                            <td><strong>{{ product.author }}</strong></td>
+                        </tr>
+                        {% if product.publisher %}
+                        <tr>
+                            <td class="text-muted">Видавництво</td>
+                            <td><strong>{{ product.publisher }}</strong></td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="text-muted">Категорія</td>
+                            <td><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Рейтинг</td>
+                            <td><strong>{{ product.rating }} ★</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Наявність</td>
+                            <td>
+                                {% if product.stock > 0 %}
+                                <span class="in-stock">✅ В наявності</span>
+                                {% else %}
+                                <span class="out-of-stock">❌ Немає</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="buy-block">
+                <div class="buy-price-block mb-3">
+                    {% if product.old_price %}
+                    <div class="buy-old-price">{{ product.old_price }} грн</div>
+                    {% endif %}
+                    <div class="buy-price">{{ product.price }} грн</div>
+                    {% if product.discount_percent %}
+                    <span class="badge bg-danger mt-1">Знижка {{ product.discount_percent }}%</span>
+                    {% endif %}
+                </div>
+                <div class="stock-status mb-3">
+                    {% if product.stock > 0 %}
+                    <span class="in-stock">
+                        <i class="fas fa-check-circle me-1"></i>В наявності ({{ product.stock }} шт.)
+                    </span>
+                    {% else %}
+                    <span class="out-of-stock">
+                        <i class="fas fa-times-circle me-1"></i>Немає в наявності
+                    </span>
+                    {% endif %}
+                </div>
+                {% if product.stock > 0 %}
+                <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <label class="text-muted small">Кількість:</label>
+                        <input type="number" name="quantity" value="1"
+                               min="1" max="{{ product.stock }}"
+                               class="form-control form-control-sm qty-input">
+                    </div>
+                    <button type="submit" class="btn btn-buy w-100 mb-2">
+                        <i class="fas fa-shopping-cart me-2"></i>Додати до кошика
+                    </button>
+                </form>
+                <a href="{% url 'orders:checkout' %}" class="btn btn-outline-primary w-100 mb-3">
+                    <i class="fas fa-bolt me-1"></i>Купити зараз
+                </a>
+                {% endif %}
+                <div class="delivery-info">
+                    <div class="delivery-item">
+                        <i class="fas fa-truck text-success"></i>
+                        <span>Безкоштовна доставка від 990 грн</span>
+                    </div>
+                    <div class="delivery-item">
+                        <i class="fas fa-undo text-info"></i>
+                        <span>Повернення 14 днів</span>
+                    </div>
+                    <div class="delivery-item">
+                        <i class="fas fa-shield-alt text-warning"></i>
+                        <span>Гарантія якості</span>
+                    </div>
+                    <div class="delivery-item">
+                        <i class="fas fa-clock text-primary"></i>
+                        <span>Доставка 1-3 дні</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related %}
+    <section class="mt-5 pt-4 border-top">
+        <h3 class="section-title mb-4">📚 Схожі книги</h3>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+            {% for product in related %}
+            <div class="col">
+                {% include 'shop/includes/product_card.html' %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

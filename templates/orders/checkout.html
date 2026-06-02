@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Оформлення замовлення — КнигоСвіт{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}">Головна</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cart:cart_detail' %}">Кошик</a></li>
+            <li class="breadcrumb-item active">Оформлення</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">📦 Оформлення замовлення</h1>
+
+    <div class="row g-4">
+        <!-- FORM -->
+        <div class="col-lg-7">
+            <div class="checkout-card">
+                <h5 class="mb-4"><i class="fas fa-user me-2"></i>Дані отримувача</h5>
+                <form method="post" id="checkout-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">Ім'я *</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Прізвище *</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Телефон *</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3"><i class="fas fa-map-marker-alt me-2"></i>Адреса доставки</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Місто *</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Поштовий індекс *</label>
+                            {{ form.postal_code }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Адреса *</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Коментар</label>
+                            {{ form.comment }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ORDER SUMMARY -->
+        <div class="col-lg-5">
+            <div class="cart-summary">
+                <h5 class="cart-summary-title">Ваше замовлення</h5>
+
+                {% for item in cart %}
+                <div class="checkout-item d-flex gap-2 mb-2">
+                    <span class="checkout-item-qty">{{ item.quantity }}×</span>
+                    <span class="checkout-item-name flex-grow-1">{{ item.product.name }}</span>
+                    <strong>{{ item.total_price }} грн</strong>
+                </div>
+                {% endfor %}
+
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Доставка:</span>
+                    <span class="text-success">
+                        {% if cart.get_total_price >= 990 %}Безкоштовно{% else %}~90 грн{% endif %}
+                    </span>
+                </div>
+                <div class="summary-total d-flex justify-content-between mb-4">
+                    <strong>Разом:</strong>
+                    <strong class="text-primary fs-5">{{ cart.get_total_price }} грн</strong>
+                </div>
+
+                <button type="submit" form="checkout-form" class="btn btn-buy w-100">
+                    <i class="fas fa-check-circle me-2"></i>Підтвердити замовлення
+                </button>
+                
+                <p class="text-muted small text-center mt-2">
+                    <i class="fas fa-shield-alt me-1"></i>Безпечна оплата. Ваші дані захищені.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

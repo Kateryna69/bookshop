@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block title %}Адмін панель — КнигоСвіт{% endblock %}
+{% block content %}
+<div class="container">
+
+    <!-- ЗАГОЛОВОК -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">⚙️ Панель адміністратора</h1>
+            <p class="text-muted">Загальна статистика магазину</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'shop:admin_orders' %}" class="btn btn-primary">
+                <i class="fas fa-list me-2"></i>Замовлення
+            </a>
+            <a href="{% url 'shop:admin_users' %}" class="btn btn-outline-primary">
+                <i class="fas fa-users me-2"></i>Користувачі
+            </a>
+            <a href="/admin/" class="btn btn-outline-secondary">
+                <i class="fas fa-cog me-2"></i>Django Admin
+            </a>
+        </div>
+    </div>
+
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="admin-stat-number">{{ total_users }}</div>
+                <div class="admin-stat-label">Всього користувачів</div>
+                <div class="admin-stat-sub text-success">+{{ new_users_month }} за місяць</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="admin-stat-number">{{ total_orders }}</div>
+                <div class="admin-stat-label">Всього замовлень</div>
+                <div class="admin-stat-sub text-success">+{{ new_orders_month }} за місяць</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="admin-stat-number">{{ total_products }}</div>
+                <div class="admin-stat-label">Книг у каталозі</div>
+                <div class="admin-stat-sub text-muted">активних</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
+                    <i class="fas fa-hryvnia-sign"></i>
+                </div>
+                <div class="admin-stat-number">{{ total_revenue|floatformat:0 }}</div>
+                <div class="admin-stat-label">Виручка (грн)</div>
+                <div class="admin-stat-sub text-muted">підтверджені</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-5">
+            <div class="admin-card">
+                <h5 class="admin-card-title">📊 Замовлення за статусами</h5>
+                <div class="status-stats">
+                    <div class="status-stat-row">
+                        <span class="status-dot" style="background:#ffc107"></span>
+                        <span class="flex-grow-1">Очікує обробки</span>
+                        <strong>{{ orders_by_status.pending }}</strong>
+                    </div>
+                    <div class="status-stat-row">
+                        <span class="status-dot" style="background:#17a2b8"></span>
+                        <span class="flex-grow-1">В обробці</span>
+                        <strong>{{ orders_by_status.processing }}</strong>
+                    </div>
+                    <div class="status-stat-row">
+                        <span class="status-dot" style="background:#007bff"></span>
+                        <span class="flex-grow-1">Відправлено</span>
+                        <strong>{{ orders_by_status.shipped }}</strong>
+                    </div>
+                    <div class="status-stat-row">
+                        <span class="status-dot" style="background:#28a745"></span>
+                        <span class="flex-grow-1">Доставлено</span>
+                        <strong>{{ orders_by_status.delivered }}</strong>
+                    </div>
+                    <div class="status-stat-row">
+                        <span class="status-dot" style="background:#dc3545"></span>
+                        <span class="flex-grow-1">Скасовано</span>
+                        <strong>{{ orders_by_status.cancelled }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="admin-card">
+                <h5 class="admin-card-title">🏆 Топ 5 книг за замовленнями</h5>
+                {% for product in top_products %}
+                <div class="top-product-row">
+                    <span class="top-product-rank">{{ forloop.counter }}</span>
+                    <div class="top-product-img">
+                        {% if product.cover %}
+                        <img src="{{ product.cover.url }}" alt="{{ product.name }}">
+                        {% else %}
+                        <span>📖</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ product.name }}</div>
+                        <div class="text-muted" style="font-size:0.75rem">{{ product.author }}</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-primary">{{ product.sold }}</div>
+                        <div class="text-muted" style="font-size:0.75rem">замовлень</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-3">Ще немає замовлень</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="admin-card-title mb-0">🛒 Останні замовлення</h5>
+            <a href="{% url 'shop:admin_orders' %}" class="btn btn-sm btn-outline-primary">Всі замовлення</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Клієнт</th>
+                        <th>Книг</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>
+                            <div>{{ order.first_name }} {{ order.last_name }}</div>
+                            <div class="text-muted small">{{ order.email }}</div>
+                        </td>
+                        <td>{{ order.items.count }}</td>
+                        <td><strong>{{ order.total_price }} грн</strong></td>
+                        <td>
+                            <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </td>
+                        <td class="text-muted small">{{ order.created|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="admin-card-title mb-0">👥 Нові користувачі</h5>
+            <a href="{% url 'shop:admin_users' %}" class="btn btn-sm btn-outline-primary">Всі користувачі</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Ім'я</th>
+                        <th>Замовлень</th>
+                        <th>Дата реєстрації</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in recent_users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.orders.count }}</td>
+                        <td class="text-muted small">{{ user.date_joined|date:"d.m.Y" }}</td>
+                        <td>
+                            {% if user.is_staff %}
+                            <span class="badge bg-danger">Адмін</span>
+                            {% else %}
+                            <span class="badge bg-success">Активний</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

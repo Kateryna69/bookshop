@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% block title %}Мій профіль — КнигоСвіт{% endblock %}
+{% block content %}
+<div class="container">
+
+    {% if not edit_mode %}
+  
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="profile-card">
+                <h5 class="profile-card-title">
+                    <i class="fas fa-user me-2 text-primary"></i>Мій профіль
+                </h5>
+
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;flex-shrink:0;border:3px solid var(--accent);">
+                        {% if request.user.avatar %}
+                        <img src="{{ request.user.avatar.url }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                        <div style="width:100%;height:100%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:white;">
+                            {{ request.user.first_name|first|upper|default:request.user.email|first|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            {% if request.user.first_name %}
+                                {{ request.user.first_name }} {{ request.user.last_name }}
+                            {% else %}
+                                {{ request.user.username }}
+                            {% endif %}
+                        </h4>
+                        <p class="text-muted small mb-0">{{ request.user.email }}</p>
+                    </div>
+                </div>
+
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-phone me-2 text-success"></i>Телефон</span>
+                        <span class="profile-info-value">{{ request.user.phone|default:"Не вказано" }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-city me-2 text-info"></i>Місто</span>
+                        <span class="profile-info-value">{{ request.user.profile.city|default:"Не вказано" }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Адреса</span>
+                        <span class="profile-info-value">{{ request.user.profile.address|default:"Не вказано" }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-birthday-cake me-2 text-warning"></i>Дата народження</span>
+                        <span class="profile-info-value">
+                            {% if request.user.profile.birth_date %}
+                                {{ request.user.profile.birth_date|date:"d.m.Y" }}
+                            {% else %}
+                                Не вказано
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <a href="?edit=1" class="btn btn-buy w-100 mt-4">
+                    <i class="fas fa-user-edit me-2"></i>Редагувати профіль
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="profile-card mb-4">
+                <h5 class="profile-card-title">
+                    <i class="fas fa-chart-bar me-2 text-success"></i>Моя статистика
+                </h5>
+                <div class="row g-3 text-center mb-3">
+                    <div class="col-6">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ orders|length }}</div>
+                            <div class="stat-label">Замовлень</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ request.user.wishlist.count }}</div>
+                            <div class="stat-label">У бажаному</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'orders:order_list' %}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                        <i class="fas fa-list me-1"></i>Замовлення
+                    </a>
+                    <a href="{% url 'shop:wishlist' %}" class="btn btn-outline-danger btn-sm flex-grow-1">
+                        <i class="fas fa-heart me-1"></i>Бажане
+                    </a>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <h5 class="profile-card-title">
+                    <i class="fas fa-shopping-bag me-2 text-warning"></i>Останні замовлення
+                </h5>
+                {% if orders %}
+                {% for order in orders %}
+                <a href="{% url 'orders:order_detail' order.id %}"
+                   class="order-mini-card d-block mb-2 text-decoration-none">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="text-dark">#{{ order.id }}</strong>
+                            <span class="text-muted small ms-2">{{ order.created|date:"d.m.Y" }}</span>
+                        </div>
+                        <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <span class="text-muted small">{{ order.items.count }} книг</span>
+                        <strong class="text-primary small">{{ order.total_price }} грн</strong>
+                    </div>
+                </a>
+                {% endfor %}
+                <a href="{% url 'orders:order_list' %}" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                    Всі замовлення
+                </a>
+                {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted small">Замовлень ще немає</p>
+                    <a href="{% url 'shop:product_list' %}" class="btn btn-sm btn-primary">До каталогу</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="profile-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="profile-card-title mb-0">
+                        <i class="fas fa-user-edit me-2 text-primary"></i>Редагувати профіль
+                    </h5>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Назад
+                    </a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <label class="form-label fw-bold">Фото профілю</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid #dee2e6;">
+                                {% if request.user.avatar %}
+                                <img src="{{ request.user.avatar.url }}" style="width:100%;height:100%;object-fit:cover;">
+                                {% else %}
+                                <div style="width:100%;height:100%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:white;">
+                                    {{ request.user.first_name|first|upper|default:"?" }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <input type="file" name="avatar" class="form-control form-control-sm" accept="image/*">
+                                <div class="text-muted small mt-1">JPG, PNG до 5MB</div>
+                            </div>
+                        </div>
+                        {% if request.user.avatar %}
+                        <div class="mt-2">
+                            <button type="submit" name="delete_avatar" value="1"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Видалити фото профілю?')">
+                                <i class="fas fa-trash me-1"></i>Видалити фото
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Ім'я</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Прізвище</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Телефон</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Місто</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Дата народження</label>
+                            {{ form.birth_date }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Адреса доставки</label>
+                        {{ form.address }}
+                        <div class="text-muted small mt-1">
+                            Автоматично підставляється при оформленні замовлення
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-buy w-100">
+                        <i class="fas fa-save me-2"></i>Зберегти зміни
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="profile-card mb-4">
+                <h5 class="profile-card-title">
+                    <i class="fas fa-chart-bar me-2 text-success"></i>Моя статистика
+                </h5>
+                <div class="row g-3 text-center mb-3">
+                    <div class="col-6">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ orders|length }}</div>
+                            <div class="stat-label">Замовлень</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ request.user.wishlist.count }}</div>
+                            <div class="stat-label">У бажаному</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'orders:order_list' %}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                        <i class="fas fa-list me-1"></i>Замовлення
+                    </a>
+                    <a href="{% url 'shop:wishlist' %}" class="btn btn-outline-danger btn-sm flex-grow-1">
+                        <i class="fas fa-heart me-1"></i>Бажане
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
